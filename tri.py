@@ -1,24 +1,19 @@
-ofi1 = open('fichier1.txt', 'r')
-ofi2 = open('fichier2.txt', 'w')
-text2= []
-text1 = ofi1.read()
-ofi1.close()
-cpt = 0
+fichierInput = input('Le nom du fichier à trier?\n')
+delimiteur = input('Le delimiteur de fin de fonction?\n')
+ofiInput = open(fichierInput, 'r')
+ofiOutput = open('fichierOutput.txt', 'w')
+tableauFonction= []
+text = ofiInput.read()
+ofiInput.close()
 fonction = ""
-for y in range(len(text1)):
-	if text1[y] == '/' and text1[y+1] == '/':
-		word = "" + text1[y:y+9]
-	else:
-		word = ""
-
-	if word == "// change" or (y+1)==len(text1):
-		print("fonction: " + fonction)
-		text2.append(fonction)
+for y in range(len(text)):
+	fonction = fonction + text[y]
+	if text[y:y+9] == "// change" or (y+1)==len(text):
+		tableauFonction.append(fonction)
 		fonction =""
-	fonction = fonction + text1[y]
 
-text2.sort()
+tableauFonction.sort()
 
-for fonction in text2:
-	ofi2.write(fonction)
-ofi2.close()
+for fonction in tableauFonction:
+	ofiOutput.write(fonction)
+ofiOutput.close()
