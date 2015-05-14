@@ -1,2 +1,2 @@
 import os
-os.system('service minecraft start')
+os.system('/etc/init.d/minecraft start')
