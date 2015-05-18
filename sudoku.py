@@ -1,19 +1,7 @@
 import array
 import turtle
 
-sudoku = [
-[6,0,9,0,0,5,2,0,0],
-[0,5,1,4,0,8,0,0,7],
-[7,4,0,0,6,0,8,9,0],
-[0,1,0,6,0,0,0,7,8],
-[3,9,0,0,0,0,0,1,6],
-[5,6,0,0,0,4,0,2,0],
-[0,3,4,0,2,0,0,5,9],
-[8,0,0,9,0,3,1,6,0],
-[0,0,6,5,0,0,3,0,4]]
-
-
-def carre(sudoku):
+def sudokuToCarres(sudoku):
 	carres = []
 	for x1 in range(0,3):
 		for y1 in range(0,3):
@@ -25,22 +13,31 @@ def carre(sudoku):
 	return carres
 
 def carresToSudoku(carres):
-	sudoku = [[0]*10]*10
+	sudoku = []
 	for x in range(0,9):
-		for y in range(0,9):			
-				c = x%3
-				l = (y//3)
-				sudoku[c][l] = carres[x][y]
+		ligne = []
+		for y in range(0,3):
+			for z in range(0,3):
+				ligne.append(carres[y+(x//3)*3][z+(x%3)*3])
+		sudoku.append(ligne)
 	return sudoku
 
 
-def ligne(sudoku):
+def sudokuToLignes(sudoku):
 	lignes = []
 	for x in range(0,9):
 		lignes.append(sudoku[x])
+	print(lignes)
 	return lignes
 
-def colonne(sudoku):
+def lignesToSudoku(lignes):
+	sudoku = []
+	for ligne in lignes:
+		sudoku.append(ligne)
+	print(sudoku)
+	return sudoku
+
+def sudokuToColonnes(sudoku):
 	colonnes = []
 	for y in range(0,9):
 		colonne = []
@@ -49,14 +46,23 @@ def colonne(sudoku):
 		colonnes.append(colonne)
 	return colonnes
 
-def isManquant(tableau,nb):
+def colonnesToSudoku(colonnes):
+	sudoku = []
 	for x in range(0,9):
-		if tableau[x] == nb:
+		ligne = []
+		for colonne in colonnes:
+			ligne.append(colonne[x])
+		sudoku.append(ligne)
+	return sudoku
+
+def isManquant(tableau,nb):
+	for case in tableau:
+		if case == nb:
 			return False
 	return True
 def isPresent(tableau,nb):
-	for x in range(0,9):
-		if tableau[x] == nb:
+	for case in tableau:
+		if case == nb:
 			return True
 	return False
 
@@ -71,7 +77,6 @@ def doublon(match):
 	first = False
 	doublon = False
 	nbMatch = 0
-	print(match)
 	for nb, value in match.items():
 		if first and value:
 			doublon = True
@@ -83,64 +88,145 @@ def doublon(match):
 	else:
 		return 0
 
-def match(nbs,colonnes,lignes,c,l):
+def match(nbs,tableau1,tableau2):
 		match = {}
 		trouve = False	
 		for nb in nbs:
-			colonnePresent = isPresent(colonnes[c],nb) 
-			lignePresent = isPresent(lignes[l],nb)
-			trouve = not colonnePresent and not lignePresent
+			tableau1Present = isPresent(tableau1,nb) 
+			tableau2Present = isPresent(tableau2,nb)
+			trouve = not tableau1Present and not tableau2Present
 			match[nb] = trouve
 		return match
 
 def affichage(sudoku):
-	
-	for y in range(0,10):
+	turtle.speed(0)
+	turtle.delay(1)
+	cpt = 0
+	for y in range(-5,5):
+		if cpt%3 == 0 :
+			turtle.pensize(2)
+		else:
+			turtle.pensize(1)
+		cpt += 1
 		turtle.up()
-		turtle.goto(0,y*20)
+		turtle.goto(-180,(y*40)+20)
 		turtle.down()
-		turtle.goto(180,y*20)
+		turtle.goto(180,(y*40)+20)
 		turtle.up()
 
-
-	for x in range(0,10):
+	cpt = 0
+	for x in range(-5,5):
+		if cpt%3 == 0 :
+			turtle.pensize(2)
+		else:
+			turtle.pensize(1)
+		cpt += 1
 		turtle.up()
-		turtle.goto(x*20,0)
+		turtle.goto((x*40)+20,-180)
 		turtle.down()
-		turtle.goto(x*20,180)
+		turtle.goto((x*40)+20,180)
 		turtle.up()
 
-	for y in range(0,9):
-		for x in range(0,9):
+	x = -4
+	for l in range(0,9):
+		y = 4
+		for c in range(0,9):
 			turtle.up()
-			turtle.goto(x*20+10,y*20+3)
-			turtle.write(sudoku[x][y], True, align="center")
-	turtle.exitonclick()
+			turtle.goto(x*40,(y*40)-10)
+			if sudoku[l][c] != 0:
+				turtle.write(sudoku[l][c], True, align="center",  font=("Arial", 16, "normal"))
+			y -= 1
+		x += 1
 
-carres = carre(sudoku)
-lignes = ligne(sudoku)
-colonnes = colonne(sudoku)
+def iteration(sudoku):
+	lignes = sudokuToLignes(sudoku)
+	colonnes = sudokuToColonnes(sudoku)	
+	carres = sudokuToCarres(sudoku)
+	cpt = 0
+	for ligne in lignes:
+		nbs= nbManquant(ligne)
+		ligneProvisoire = [[0]]*9
+		for x in range(0,9):		
+			ligneProvisoire[x]=[ligne[x]]
+			case = ligne[x]
+			if case == 0 :
+				print(str(x) + ":" + str(cpt) + ":" + str((x//3) + (cpt//3)*3))
+				matchs = match(nbs,colonnes[x],carres[(x//3) + (cpt//3)*3])
+				ligneProvisoire[x].append(doublon(matchs))
+		print(ligneProvisoire)
+		for x in range(0,9):
+			if len(ligneProvisoire[x]) == 2:
+				ligne[x]=ligneProvisoire[x][1] 
+		cpt +=1
+	sudoku = lignesToSudoku(lignes)
+	
+	colonnes = sudokuToColonnes(sudoku)
+	cpt = 0
+	for colonne in colonnes:
+		nbs= nbManquant(colonne)
+		colonneProvisoire = [[0]]*9
+		for x in range(0,9):		
+			colonneProvisoire[x]=[colonne[x]]
+			case = colonne[x]
+			if case == 0 :
+				print(str(x) + ":" + str(cpt) + ":" + str((x//3) + (cpt//3)*3))
+				matchs = match(nbs,lignes[x],carres[(x%3) + (cpt%3)])
+				colonneProvisoire[x].append(doublon(matchs))
+		print(colonneProvisoire)
+		for x in range(0,9):
+			if len(colonneProvisoire[x]) == 2:
+				colonne[x]=colonneProvisoire[x][1] 
+		cpt +=1
+	sudoku = colonnesToSudoku(colonnes)
 
-sudoku = carresToSudoku(carres)
-"""for i in range(0,10):	
+	carres = sudokuToCarres(sudoku)
 	cpt = 0
 	for carre in carres:
 		nbs= nbManquant(carre)
-		print(nbs)
-		for x in range(0,9):
+		carreProvisoire = [[0]]*9
+		for x in range(0,9):		
+			carreProvisoire[x]=[carre[x]]
 			case = carre[x]
-			if case == 0 :				
-				c = x%3+(cpt%3)*3
-				l = (x//3)+(cpt//3)
-				print("lignes: " + str(l) + " colonne: " + str(c))	
-				matchs = match(nbs,colonnes,lignes,c,l)
-				carre[x]=doublon(matchs)
+			if case == 0 :
+				print(str(x) + ":" + str(cpt) + ":" + str((x//3) + (cpt//3)*3))
+				matchs = match(nbs,colonnes[(x%3) + (cpt%3)*3],lignes[(x//3) + (cpt//3)])
+				carreProvisoire[x].append(doublon(matchs))
+		print(carreProvisoire)
+		for x in range(0,9):
+			if len(carreProvisoire[x]) == 2:
+				carre[x]=carreProvisoire[x][1] 
+		cpt +=1
+		sudoku = carresToSudoku(carres)
 
-		cpt += 1
+	return sudoku
 
-	print(i)
-	print(carres)
+"""sudoku = [
+[4,0,5,0,0,3,2,0,9],
+[0,0,0,0,0,0,0,4,0],
+[1,7,0,0,0,5,0,0,0],
+[6,0,0,5,0,0,4,0,2],
+[3,0,0,9,0,7,0,0,1],
+[2,0,7,0,0,4,0,0,3],
+[0,0,0,7,0,0,0,5,4],
+[0,6,0,0,0,0,0,0,0],
+[7,0,1,3,0,0,9,0,6]]
+"""
+sudoku = [
+[6,0,9,0,0,5,2,0,0],
+[0,5,1,4,0,8,0,0,7],
+[7,4,0,0,6,0,8,9,0],
+[0,1,0,6,0,0,0,7,8],
+[3,9,0,0,0,0,0,1,6],
+[5,6,0,0,0,4,0,2,0],
+[0,3,4,0,2,0,0,5,9],
+[8,0,0,9,0,3,1,6,0],
+[0,0,6,5,0,0,3,0,4]]
 
-affichage(sudoku)"""
-print(carres)
-print(sudoku)
+affichage(sudoku)
+toto = "y"
+while toto == "y" :
+	iteration(sudoku)
+	affichage(sudoku)
+	toto = input("continuer?")
+turtle.bye()
+turtle.mainloop()
