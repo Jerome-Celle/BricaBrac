@@ -88,7 +88,7 @@ def doublon(match):
 		return 0
 
 def match(nbs,tableau1,tableau2):
-		match = {}
+		match = [False]*10
 		trouve = False	
 		for nb in nbs:
 			tableau1Present = isPresent(tableau1,nb) 
@@ -175,36 +175,29 @@ def iteration(sudoku):
 	sudoku = colonnesToSudoku(colonnes)
 	
 	carres = sudokuToCarres(sudoku)
-	cpt = 0
-	for carre in carres:
-		nbs= nbManquant(carre)
-		carreProvisoire = [[0]]*9
-		for x in range(0,9):		
-			carreProvisoire[x]=[carre[x]]
-			case = carre[x]
-			if case == 0 :
-				matchs = match(nbs,colonnes[(x%3) + (cpt%3)*3],lignes[(x//3) + (cpt//3)])
-				carreProvisoire[x].append(doublon(matchs))
-		for x in range(0,9):
-			if len(carreProvisoire[x]) == 2:
-				carre[x]=carreProvisoire[x] 
-		cpt +=1
+	
 	sudokuProvisoire2 = carresToSudoku(carres)
 
-	sudokuProvisoire = [[[0]]*9]*9
-	for y in range(0,9):
-		#for x in range(0,9):
-		sudokuProvisoire[y] = sudokuProvisoire[y] + sudokuProvisoire2[y]
-		print(sudokuProvisoire[y])
-	print(sudokuProvisoire)
 
-
-
-	for y in range(0,9):
-		for x in range(0,9):
-			if len(sudokuProvisoire[y][x]) == 2:
-				sudoku[y][x]=sudokuProvisoire[y][x][1] 
 	return sudoku
+
+def possibleCarres(carres, colonnes, lignes):
+	cpt = 0
+	matchCarres=[]
+	for carre in carres:
+		matchCarre = []
+		nbs= nbManquant(carre)
+		for x in range(0,9):		
+			case = carre[x]
+			matchs = [False]*10
+			if case == 0 :
+				matchs = match(nbs,colonnes[(x%3) + (cpt%3)*3],lignes[(x//3) + (cpt//3)])
+			matchCarre.append(matchs)
+		matchCarres.append(matchCarre)
+		cpt +=1
+	return matchCarres
+
+
 """
 sudoku = [
 [4,0,5,0,0,3,2,0,9],
@@ -227,7 +220,7 @@ sudoku = [
 [0,3,4,0,2,0,0,5,9],
 [8,0,0,9,0,3,1,6,0],
 [0,0,6,5,0,0,3,0,4]]
-
+"""
 affichage(sudoku)
 toto = "y"
 while toto == "y" :
@@ -245,4 +238,19 @@ while toto == "y" :
 	print("")
 	affichage(sudoku)
 	toto = input("continuer?")
+"""
 
+lignes = sudokuToLignes(sudoku)
+colonnes = sudokuToColonnes(sudoku)	
+carres = sudokuToCarres(sudoku)
+matchSudoku = [[[False]*10]*9]*9
+matchSudoku2 = carresToSudoku(possibleCarres(carres,colonnes,lignes))
+for y in range(0,9):
+    for x in range(0,9):
+        for z in range(0,10):
+            valeur1 = matchSudoku[y][x][z]
+            valeur2 = matchSudoku2[y][x][z]
+            test =  valeur1 or valeur2
+            matchSudoku[y][x][z] = test
+
+print("toto")
