@@ -1,5 +1,6 @@
 import array
 import turtle
+import numpy
 
 def sudokuToCarres(sudoku):
 	carres = []
@@ -186,15 +187,23 @@ def iteration(sudoku):
 				carreProvisoire[x].append(doublon(matchs))
 		for x in range(0,9):
 			if len(carreProvisoire[x]) == 2:
-				carre[x]=carreProvisoire[x][1] 
+				carre[x]=carreProvisoire[x] 
 		cpt +=1
-	sudokuProvisoire = carresToSudoku(carres)
+	sudokuProvisoire2 = carresToSudoku(carres)
+
+	sudokuProvisoire = [[[0]]*9]*9
+	for y in range(0,9):
+		#for x in range(0,9):
+		sudokuProvisoire[y] = sudokuProvisoire[y] + sudokuProvisoire2[y]
+		print(sudokuProvisoire[y])
+	print(sudokuProvisoire)
+
+
 
 	for y in range(0,9):
 		for x in range(0,9):
 			if len(sudokuProvisoire[y][x]) == 2:
 				sudoku[y][x]=sudokuProvisoire[y][x][1] 
-
 	return sudoku
 """
 sudoku = [
