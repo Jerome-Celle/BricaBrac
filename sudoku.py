@@ -27,14 +27,12 @@ def sudokuToLignes(sudoku):
 	lignes = []
 	for x in range(0,9):
 		lignes.append(sudoku[x])
-	print(lignes)
 	return lignes
 
 def lignesToSudoku(lignes):
 	sudoku = []
 	for ligne in lignes:
 		sudoku.append(ligne)
-	print(sudoku)
 	return sudoku
 
 def sudokuToColonnes(sudoku):
@@ -150,10 +148,8 @@ def iteration(sudoku):
 			ligneProvisoire[x]=[ligne[x]]
 			case = ligne[x]
 			if case == 0 :
-				print(str(x) + ":" + str(cpt) + ":" + str((x//3) + (cpt//3)*3))
 				matchs = match(nbs,colonnes[x],carres[(x//3) + (cpt//3)*3])
 				ligneProvisoire[x].append(doublon(matchs))
-		print(ligneProvisoire)
 		for x in range(0,9):
 			if len(ligneProvisoire[x]) == 2:
 				ligne[x]=ligneProvisoire[x][1] 
@@ -169,16 +165,14 @@ def iteration(sudoku):
 			colonneProvisoire[x]=[colonne[x]]
 			case = colonne[x]
 			if case == 0 :
-				print(str(x) + ":" + str(cpt) + ":" + str((x//3) + (cpt//3)*3))
 				matchs = match(nbs,lignes[x],carres[(x%3) + (cpt%3)])
 				colonneProvisoire[x].append(doublon(matchs))
-		print(colonneProvisoire)
 		for x in range(0,9):
 			if len(colonneProvisoire[x]) == 2:
 				colonne[x]=colonneProvisoire[x][1] 
 		cpt +=1
 	sudoku = colonnesToSudoku(colonnes)
-
+	
 	carres = sudokuToCarres(sudoku)
 	cpt = 0
 	for carre in carres:
@@ -188,19 +182,22 @@ def iteration(sudoku):
 			carreProvisoire[x]=[carre[x]]
 			case = carre[x]
 			if case == 0 :
-				print(str(x) + ":" + str(cpt) + ":" + str((x//3) + (cpt//3)*3))
 				matchs = match(nbs,colonnes[(x%3) + (cpt%3)*3],lignes[(x//3) + (cpt//3)])
 				carreProvisoire[x].append(doublon(matchs))
-		print(carreProvisoire)
 		for x in range(0,9):
 			if len(carreProvisoire[x]) == 2:
 				carre[x]=carreProvisoire[x][1] 
 		cpt +=1
-		sudoku = carresToSudoku(carres)
+	sudokuProvisoire = carresToSudoku(carres)
+
+	for y in range(0,9):
+		for x in range(0,9):
+			if len(sudokuProvisoire[y][x]) == 2:
+				sudoku[y][x]=sudokuProvisoire[y][x][1] 
 
 	return sudoku
-
-"""sudoku = [
+"""
+sudoku = [
 [4,0,5,0,0,3,2,0,9],
 [0,0,0,0,0,0,0,4,0],
 [1,7,0,0,0,5,0,0,0],
@@ -225,8 +222,18 @@ sudoku = [
 affichage(sudoku)
 toto = "y"
 while toto == "y" :
-	iteration(sudoku)
+	sudoku = iteration(sudoku)
+	for i in range(0,9):
+		print(sudoku[i])
+	carres = sudokuToCarres(sudoku)
+	print("")
+	for i in range(0,9):
+		print(carres[i])
+	sudoku = carresToSudoku(carres)
+	print("")
+	for i in range(0,9):
+		print(sudoku[i])
+	print("")
 	affichage(sudoku)
 	toto = input("continuer?")
-turtle.bye()
-turtle.mainloop()
+
