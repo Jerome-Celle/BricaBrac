@@ -126,60 +126,17 @@ def affichage(sudoku):
 		turtle.goto((x*40)+20,180)
 		turtle.up()
 
-	x = -4
+	y = 4
 	for l in range(0,9):
-		y = 4
+		x = -4
 		for c in range(0,9):
 			turtle.up()
 			turtle.goto(x*40,(y*40)-10)
 			if sudoku[l][c] != 0:
 				turtle.write(sudoku[l][c], True, align="center",  font=("Arial", 16, "normal"))
-			y -= 1
-		x += 1
+			x += 1
+		y -= 1
 
-def iteration(sudoku):
-	lignes = sudokuToLignes(sudoku)
-	colonnes = sudokuToColonnes(sudoku)	
-	carres = sudokuToCarres(sudoku)
-	cpt = 0
-	for ligne in lignes:
-		nbs= nbManquant(ligne)
-		ligneProvisoire = [[0]]*9
-		for x in range(0,9):		
-			ligneProvisoire[x]=[ligne[x]]
-			case = ligne[x]
-			if case == 0 :
-				matchs = match(nbs,colonnes[x],carres[(x//3) + (cpt//3)*3])
-				ligneProvisoire[x].append(doublon(matchs))
-		for x in range(0,9):
-			if len(ligneProvisoire[x]) == 2:
-				ligne[x]=ligneProvisoire[x][1] 
-		cpt +=1
-	sudoku = lignesToSudoku(lignes)
-	
-	colonnes = sudokuToColonnes(sudoku)
-	cpt = 0
-	for colonne in colonnes:
-		nbs= nbManquant(colonne)
-		colonneProvisoire = [[0]]*9
-		for x in range(0,9):		
-			colonneProvisoire[x]=[colonne[x]]
-			case = colonne[x]
-			if case == 0 :
-				matchs = match(nbs,lignes[x],carres[(x%3) + (cpt%3)])
-				colonneProvisoire[x].append(doublon(matchs))
-		for x in range(0,9):
-			if len(colonneProvisoire[x]) == 2:
-				colonne[x]=colonneProvisoire[x][1] 
-		cpt +=1
-	sudoku = colonnesToSudoku(colonnes)
-	
-	carres = sudokuToCarres(sudoku)
-	
-	sudokuProvisoire2 = carresToSudoku(carres)
-
-
-	return sudoku
 
 def possibleCarres(carres, colonnes, lignes):
 	cpt = 0
@@ -187,7 +144,7 @@ def possibleCarres(carres, colonnes, lignes):
 	for carre in carres:
 		matchCarre = []
 		nbs= nbManquant(carre)
-		for x in range(0,9):		
+		for x in range(0,9):
 			case = carre[x]
 			matchs = [False]*10
 			if case == 0 :
@@ -197,60 +154,161 @@ def possibleCarres(carres, colonnes, lignes):
 		cpt +=1
 	return matchCarres
 
+def possibleColonnes(carres, colonnes, lignes):
+    cpt = 0
+    matchColonnes=[]
+    for colonne in colonnes:
+        matchColonne = []
+        nbs= nbManquant(colonne)
+        for x in range(0,9):
+            case = colonne[x]
+            matchs = [False]*10
+            if case == 0 :
+                matchs = match(nbs,lignes[x],carres[(x%3) + (cpt%3)])
+            matchColonne.append(matchs)
+        matchColonnes.append(matchColonne)
+        cpt +=1
+    return matchColonnes
 
+def possibleLignes(carres, colonnes, lignes):
+    cpt = 0
+    matchLignes=[]
+    for ligne in lignes:
+        matchLigne = []
+        nbs= nbManquant(ligne)
+        for x in range(0,9):
+            case = ligne[x]
+            matchs = [False]*10
+            if case == 0 :
+                matchs = match(nbs,colonnes[x],carres[(x//3) + (cpt//3)*3])
+            matchLigne.append(matchs)
+        matchLignes.append(matchLigne)
+        cpt +=1
+    return matchLignes
+
+
+
+
+sudoku = [
+[7,0,6,0,0,4,9,0,8],
+[0,0,0,0,0,0,0,7,0],
+[1,2,0,0,0,8,0,0,0],
+[4,0,0,1,0,0,8,0,3],
+[9,0,0,8,0,6,0,0,4],
+[3,0,1,0,0,2,0,0,7],
+[0,0,0,2,0,0,0,8,9],
+[0,1,0,0,0,0,0,0,0],
+[6,0,3,4,0,0,2,0,1]]
 """
 sudoku = [
-[4,0,5,0,0,3,2,0,9],
-[0,0,0,0,0,0,0,4,0],
-[1,7,0,0,0,5,0,0,0],
-[6,0,0,5,0,0,4,0,2],
-[3,0,0,9,0,7,0,0,1],
-[2,0,7,0,0,4,0,0,3],
-[0,0,0,7,0,0,0,5,4],
-[0,6,0,0,0,0,0,0,0],
-[7,0,1,3,0,0,9,0,6]]
-"""
-sudoku = [
-[6,0,9,0,0,5,2,0,0],
-[0,5,1,4,0,8,0,0,7],
-[7,4,0,0,6,0,8,9,0],
-[0,1,0,6,0,0,0,7,8],
-[3,9,0,0,0,0,0,1,6],
-[5,6,0,0,0,4,0,2,0],
-[0,3,4,0,2,0,0,5,9],
-[8,0,0,9,0,3,1,6,0],
-[0,0,6,5,0,0,3,0,4]]
-"""
+[0,4,9,1,0,2,8,3,5],
+[0,8,0,7,0,0,0,0,0],
+[0,0,1,0,0,9,7,4,0],
+[0,2,6,0,3,4,0,7,0],
+[4,1,0,0,0,0,0,5,3],
+[0,3,0,9,1,0,6,2,0],
+[0,9,8,2,0,0,4,0,0],
+[0,0,0,0,0,3,0,8,0],
+[5,7,4,6,0,8,3,1,0]]"""
+
+for i in range(0,20):
+    lignes = sudokuToLignes(sudoku)
+    colonnes = sudokuToColonnes(sudoku)	
+    carres = sudokuToCarres(sudoku)
+    matchSudoku = [[[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10],
+                   [[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10],
+                   [[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10],
+                   [[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10],
+                   [[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10],
+                   [[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10],
+                   [[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10],
+                   [[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10],
+                   [[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10,[False]*10]]
+
+    """
+    matchSudoku2 = carresToSudoku(possibleCarres(carres,colonnes,lignes))
+    for y in range(0,9):
+        for x in range(0,9):
+            for z in range(0,10):
+                valeur1 = matchSudoku[y][x][z]
+                valeur2 = matchSudoku2[y][x][z]
+                test =  valeur1 or valeur2
+                matchSudoku[y][x][z] = test
+
+    carres = sudokuToCarres(sudoku)
+    matchcarres = sudokuToCarres(matchSudoku)
+    for z in range(0,9):
+        for nb in range(1,10):
+            doublon = False
+            position = -1
+            for x in range(0,9):
+                if matchcarres[z][x][nb]:
+                    if doublon == False:
+                        position = x
+                        doublon = True
+                    elif doublon == True:
+                        position = -1 
+            if position != -1:
+                carres[z][position]=nb
+    sudoku = carresToSudoku(carres)
+    """
+    
+    lignes = sudokuToLignes(sudoku)
+    colonnes = sudokuToColonnes(sudoku)	
+    carres = sudokuToCarres(sudoku)
+    matchSudoku2 = lignesToSudoku(possibleLignes(carres,colonnes,lignes))
+    for y in range(0,9):
+        for x in range(0,9):
+            for z in range(0,10):
+                valeur1 = matchSudoku[y][x][z]
+                valeur2 = matchSudoku2[y][x][z]
+                test =  valeur1 or valeur2
+                matchSudoku[y][x][z] = test
+
+    matchlignes = sudokuToLignes(matchSudoku)
+    for z in range(0,9):
+        for nb in range(1,10):
+            doublon = False
+            position = -1
+            for x in range(0,9):
+                if matchlignes[z][x][nb]:
+                    if doublon == False:
+                        position = x
+                        doublon = True
+                    elif doublon == True:
+                        position = -1 
+            if position != -1:
+                lignes[z][position]=nb
+    sudoku = lignesToSudoku(lignes)
+
+    lignes = sudokuToLignes(sudoku)
+    colonnes = sudokuToColonnes(sudoku)	
+    carres = sudokuToCarres(sudoku)
+    matchSudoku2 = colonnesToSudoku(possibleColonnes(carres,colonnes,lignes))
+    for y in range(0,9):
+        for x in range(0,9):
+            for z in range(0,10):
+                valeur1 = matchSudoku[y][x][z]
+                valeur2 = matchSudoku2[y][x][z]
+                test =  valeur1 or valeur2
+                matchSudoku[y][x][z] = test
+
+    matchcolonnes = sudokuToColonnes(matchSudoku)
+    for z in range(0,9):
+        for nb in range(1,10):
+            doublon = False
+            position = -1
+            for x in range(0,9):
+                if matchcolonnes[z][x][nb]:
+                    if doublon == False:
+                        position = x
+                        doublon = True
+                    elif doublon == True:
+                        position = -1 
+            if position != -1:
+                colonnes[z][position]=nb
+    sudoku = colonnesToSudoku(colonnes)
+
+
 affichage(sudoku)
-toto = "y"
-while toto == "y" :
-	sudoku = iteration(sudoku)
-	for i in range(0,9):
-		print(sudoku[i])
-	carres = sudokuToCarres(sudoku)
-	print("")
-	for i in range(0,9):
-		print(carres[i])
-	sudoku = carresToSudoku(carres)
-	print("")
-	for i in range(0,9):
-		print(sudoku[i])
-	print("")
-	affichage(sudoku)
-	toto = input("continuer?")
-"""
-
-lignes = sudokuToLignes(sudoku)
-colonnes = sudokuToColonnes(sudoku)	
-carres = sudokuToCarres(sudoku)
-matchSudoku = [[[False]*10]*9]*9
-matchSudoku2 = carresToSudoku(possibleCarres(carres,colonnes,lignes))
-for y in range(0,9):
-    for x in range(0,9):
-        for z in range(0,10):
-            valeur1 = matchSudoku[y][x][z]
-            valeur2 = matchSudoku2[y][x][z]
-            test =  valeur1 or valeur2
-            matchSudoku[y][x][z] = test
-
 print("toto")
