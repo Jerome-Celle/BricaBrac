@@ -1,5 +1,6 @@
 import array
 import turtle
+import numpy
 
 def sudokuToCarres(sudoku):
 	carres = []
@@ -27,14 +28,12 @@ def sudokuToLignes(sudoku):
 	lignes = []
 	for x in range(0,9):
 		lignes.append(sudoku[x])
-	print(lignes)
 	return lignes
 
 def lignesToSudoku(lignes):
 	sudoku = []
 	for ligne in lignes:
 		sudoku.append(ligne)
-	print(sudoku)
 	return sudoku
 
 def sudokuToColonnes(sudoku):
@@ -89,7 +88,7 @@ def doublon(match):
 		return 0
 
 def match(nbs,tableau1,tableau2):
-		match = {}
+		match = [False]*10
 		trouve = False	
 		for nb in nbs:
 			tableau1Present = isPresent(tableau1,nb) 
@@ -150,10 +149,8 @@ def iteration(sudoku):
 			ligneProvisoire[x]=[ligne[x]]
 			case = ligne[x]
 			if case == 0 :
-				print(str(x) + ":" + str(cpt) + ":" + str((x//3) + (cpt//3)*3))
 				matchs = match(nbs,colonnes[x],carres[(x//3) + (cpt//3)*3])
 				ligneProvisoire[x].append(doublon(matchs))
-		print(ligneProvisoire)
 		for x in range(0,9):
 			if len(ligneProvisoire[x]) == 2:
 				ligne[x]=ligneProvisoire[x][1] 
@@ -169,38 +166,40 @@ def iteration(sudoku):
 			colonneProvisoire[x]=[colonne[x]]
 			case = colonne[x]
 			if case == 0 :
-				print(str(x) + ":" + str(cpt) + ":" + str((x//3) + (cpt//3)*3))
 				matchs = match(nbs,lignes[x],carres[(x%3) + (cpt%3)])
 				colonneProvisoire[x].append(doublon(matchs))
-		print(colonneProvisoire)
 		for x in range(0,9):
 			if len(colonneProvisoire[x]) == 2:
 				colonne[x]=colonneProvisoire[x][1] 
 		cpt +=1
 	sudoku = colonnesToSudoku(colonnes)
-
+	
 	carres = sudokuToCarres(sudoku)
-	cpt = 0
-	for carre in carres:
-		nbs= nbManquant(carre)
-		carreProvisoire = [[0]]*9
-		for x in range(0,9):		
-			carreProvisoire[x]=[carre[x]]
-			case = carre[x]
-			if case == 0 :
-				print(str(x) + ":" + str(cpt) + ":" + str((x//3) + (cpt//3)*3))
-				matchs = match(nbs,colonnes[(x%3) + (cpt%3)*3],lignes[(x//3) + (cpt//3)])
-				carreProvisoire[x].append(doublon(matchs))
-		print(carreProvisoire)
-		for x in range(0,9):
-			if len(carreProvisoire[x]) == 2:
-				carre[x]=carreProvisoire[x][1] 
-		cpt +=1
-		sudoku = carresToSudoku(carres)
+	
+	sudokuProvisoire2 = carresToSudoku(carres)
+
 
 	return sudoku
 
-"""sudoku = [
+def possibleCarres(carres, colonnes, lignes):
+	cpt = 0
+	matchCarres=[]
+	for carre in carres:
+		matchCarre = []
+		nbs= nbManquant(carre)
+		for x in range(0,9):		
+			case = carre[x]
+			matchs = [False]*10
+			if case == 0 :
+				matchs = match(nbs,colonnes[(x%3) + (cpt%3)*3],lignes[(x//3) + (cpt//3)])
+			matchCarre.append(matchs)
+		matchCarres.append(matchCarre)
+		cpt +=1
+	return matchCarres
+
+
+"""
+sudoku = [
 [4,0,5,0,0,3,2,0,9],
 [0,0,0,0,0,0,0,4,0],
 [1,7,0,0,0,5,0,0,0],
@@ -221,12 +220,37 @@ sudoku = [
 [0,3,4,0,2,0,0,5,9],
 [8,0,0,9,0,3,1,6,0],
 [0,0,6,5,0,0,3,0,4]]
-
+"""
 affichage(sudoku)
 toto = "y"
 while toto == "y" :
-	iteration(sudoku)
+	sudoku = iteration(sudoku)
+	for i in range(0,9):
+		print(sudoku[i])
+	carres = sudokuToCarres(sudoku)
+	print("")
+	for i in range(0,9):
+		print(carres[i])
+	sudoku = carresToSudoku(carres)
+	print("")
+	for i in range(0,9):
+		print(sudoku[i])
+	print("")
 	affichage(sudoku)
 	toto = input("continuer?")
-turtle.bye()
-turtle.mainloop()
+"""
+
+lignes = sudokuToLignes(sudoku)
+colonnes = sudokuToColonnes(sudoku)	
+carres = sudokuToCarres(sudoku)
+matchSudoku = [[[False]*10]*9]*9
+matchSudoku2 = carresToSudoku(possibleCarres(carres,colonnes,lignes))
+for y in range(0,9):
+    for x in range(0,9):
+        for z in range(0,10):
+            valeur1 = matchSudoku[y][x][z]
+            valeur2 = matchSudoku2[y][x][z]
+            test =  valeur1 or valeur2
+            matchSudoku[y][x][z] = test
+
+print("toto")
